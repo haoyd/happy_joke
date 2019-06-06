@@ -14,7 +14,7 @@ class NewstJokePage extends StatefulWidget {
 }
 
 class _NewstJokePageState extends State<NewstJokePage> {
-  HudUtil _hudUtil;
+  HudUtil _hudUtil = HudUtil();
   JokeServerApi _api = JokeServerApi();
   JokeListInfoEntity _jokeList = JokeListInfoEntity();
   int _curPage = 1;
@@ -24,14 +24,11 @@ class _NewstJokePageState extends State<NewstJokePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _hudUtil = HudUtil();
-
     _getData();
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -43,13 +40,18 @@ class _NewstJokePageState extends State<NewstJokePage> {
         leading: null,
         centerTitle: true,
       ),
-      body: IncrementallyLoadingListView(
-          hasMore: () => !_isFinish,
-          loadMore: () async {
-            await _getData();
-          },
-          itemBuilder: _buildListItem,
-          itemCount: () => _jokeList.data != null ? _jokeList.data.length : 0
+      body: Stack(
+        children: <Widget>[
+          IncrementallyLoadingListView(
+              hasMore: () => !_isFinish,
+              loadMore: () async {
+                await _getData();
+              },
+              itemBuilder: _buildListItem,
+              itemCount: () => _jokeList.data != null ? _jokeList.data.length : 0
+          ),
+          _hudUtil.hud
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.search),
@@ -68,9 +70,9 @@ class _NewstJokePageState extends State<NewstJokePage> {
       return;
     }
 
-//    _hudUtil.show();
+    _hudUtil.show();
     JokeListInfoEntity entity = await _api.getNewstJokes(1);
-//    _hudUtil.hide();
+    _hudUtil.hide();
 
     if (entity.isNetFail()) {
       ToastUtil.show('网络错误 - $entity.error_code');
