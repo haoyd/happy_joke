@@ -17,11 +17,17 @@ class HudUtil {
   }
 
   show() {
+    if (_isLoading) {
+      return;
+    }
     hud.state.show();
     _isLoading = true;
   }
 
   hide() {
+    if (!_isLoading) {
+      return;
+    }
     hud.state.dismiss();
     _isLoading = false;
   }

@@ -67,24 +67,9 @@ class _NewstJokePageState extends State<NewstJokePage> {
       return;
     }
 
-    if (!_hudUtil.isLoading()) {
-      _hudUtil.show();
-    }
-    JokeListInfoEntity entity = await _api.getNewstJokes(_curPage);
-    _hudUtil.hide();
+    JokeListInfoEntity entity = await _api.getNewstJokes(_curPage, _hudUtil);
 
     if (entity == null) {
-      ToastUtil.show('网络错误');
-      return;
-    }
-
-    if (entity.isNetFail()) {
-      ToastUtil.show('网络错误 - $entity.error_code');
-      return;
-    }
-
-    if (entity.isDataError()) {
-      ToastUtil.show(entity.reason);
       return;
     }
 

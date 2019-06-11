@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:happy_joke/business/model/entities/RoResp.dart';
 import 'package:happy_joke/common/listeners/NetCallback.dart';
+import 'package:happy_joke/common/utils/HudUtil.dart';
+import 'package:happy_joke/common/utils/ToastUtil.dart';
 import 'package:happy_joke/constant/KeyOf3rdConstant.dart';
 import 'package:happy_joke/constant/ServerApiConstant.dart';
 import 'dart:convert';
@@ -27,11 +29,20 @@ class BaseServerApi {
     return param;
   }
 
-  Future<T> doGet<T extends RoResp>(String url, Map<String, String> param) async {
+  Future<T> doGet<T extends RoResp>(String url, Map<String, String> param, HudUtil hud) async {
     T resp;
 
     try {
+      if (hud != null) {
+        hud.show();
+      }
+
       Response response = await _net.get(url, queryParameters: buildCommonParams(param));
+
+      if (hud != null) {
+        hud.hide();
+      }
+
       if (response.statusCode == 200) {
         if (response.data['result'] != null) {
           resp = EntityFactory.generateOBJ<T>(response.data['result']);
@@ -42,13 +53,35 @@ class BaseServerApi {
       } else {
         resp.netErrorCode = response.statusCode;
       }
-      new Future.delayed(new Duration(seconds: 1), () {
-        print('task delayed');
-      });
+
+      if (_hasError(resp)) {
+        return null;
+      }
+
     } catch (e) {
       print(e);
     }
 
     return resp;
+  }
+
+  // 请求到的数据是否有异常
+  bool _hasError(RoResp resp) {
+    if (resp == null) {
+      ToastUtil.show('网络错误');
+      return true;
+    }
+
+    if (resp.isNetFail()) {
+      ToastUtil.show('网络错误 - $resp.error_code');
+      return true;
+    }
+
+    if (resp.isDataError()) {
+      ToastUtil.show(resp.reason);
+      return true;
+    }
+
+    return false;
   }
 }
