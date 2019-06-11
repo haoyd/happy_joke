@@ -76,10 +76,6 @@ class BaseServerApi {
 
       Response response = await _net.get(url, queryParameters: buildCommonParams(param));
 
-      if (hud != null) {
-        hud.hide();
-      }
-
       if (response.statusCode == 200) {
         if (response.data != null) {
           resp = EntityFactory.generateOBJ<T>(response.data);
@@ -96,6 +92,10 @@ class BaseServerApi {
 
     } catch (e) {
       print(e);
+    } finally {
+      if (hud != null) {
+        hud.hide();
+      }
     }
 
     return resp;

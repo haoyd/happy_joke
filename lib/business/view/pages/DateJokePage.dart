@@ -56,7 +56,13 @@ class _DateJokePageState extends State<DateJokePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(showDate),
+                    Row(
+                      children: <Widget>[
+                        Icon(Icons.calendar_today, color: Color(AppConstant.ThemeColor),),
+                        Text('  '),
+                        Text(showDate)
+                      ],
+                    ),
                     RaisedButton (
                       child: Text(
                         '选择日期',
