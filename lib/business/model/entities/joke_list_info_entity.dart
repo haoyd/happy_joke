@@ -34,6 +34,20 @@ class JokeListInfoEntity extends RoResp {
     this.data.addAll(data);
   }
 
+  setDatas(List<JokeItemInfo> data) {
+    if (data == null) {
+      return;
+    }
+
+    if (this.data == null) {
+      this.data = [];
+    }
+
+    this.data.clear();
+    this.data = data;
+  }
+
+
 }
 
 class JokeItemInfo {

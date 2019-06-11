@@ -59,8 +59,6 @@ class _NewstJokePageState extends State<NewstJokePage> {
     return widget;
   }
 
-  bool isHudShow = false;
-
   _getData() async {
     if (_isFinish) {
       ToastUtil.show('已到最后');
