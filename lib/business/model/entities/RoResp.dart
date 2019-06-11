@@ -9,4 +9,8 @@ abstract class RoResp {
     return netErrorCode != 200;
   }
 
+  bool isDataError() {
+    return error_code != 0;
+  }
+
 }

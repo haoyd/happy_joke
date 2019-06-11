@@ -4,7 +4,7 @@ import 'package:progress_hud/progress_hud.dart';
 class HudUtil {
 
   ProgressHUD hud;
-  bool isShowing;
+  bool _isLoading = true;
 
   HudUtil() {
     hud = new ProgressHUD(
@@ -18,12 +18,16 @@ class HudUtil {
 
   show() {
     hud.state.show();
-    isShowing = true;
+    _isLoading = true;
   }
 
   hide() {
     hud.state.dismiss();
-    isShowing = false;
+    _isLoading = false;
+  }
+  
+  bool isLoading() {
+    return _isLoading;
   }
 
 }

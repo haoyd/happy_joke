@@ -1,12 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:happy_joke/business/model/entities/RoResp.dart';
+import 'package:happy_joke/common/listeners/NetCallback.dart';
 import 'package:happy_joke/constant/KeyOf3rdConstant.dart';
 import 'package:happy_joke/constant/ServerApiConstant.dart';
 import 'dart:convert';
 
 import '../../../entity_factory.dart';
+
 class BaseServerApi {
-  
   Dio _net;
 
   BaseServerApi() {
@@ -41,12 +42,13 @@ class BaseServerApi {
       } else {
         resp.netErrorCode = response.statusCode;
       }
+      new Future.delayed(new Duration(seconds: 1), () {
+        print('task delayed');
+      });
     } catch (e) {
       print(e);
     }
 
     return resp;
   }
-
-
 }

@@ -29,7 +29,8 @@ class _NewstJokePageState extends State<NewstJokePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+
+    Widget widget = Scaffold(
       appBar: AppBar(
         title: Text(
           '最新笑话',
@@ -53,13 +54,9 @@ class _NewstJokePageState extends State<NewstJokePage> {
           _hudUtil.hud
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.search),
-        onPressed: () async {
-          await _getData();
-        },
-      ),
     );
+
+    return widget;
   }
 
   bool isHudShow = false;
@@ -70,12 +67,24 @@ class _NewstJokePageState extends State<NewstJokePage> {
       return;
     }
 
-    _hudUtil.show();
-    JokeListInfoEntity entity = await _api.getNewstJokes(1);
+    if (!_hudUtil.isLoading()) {
+      _hudUtil.show();
+    }
+    JokeListInfoEntity entity = await _api.getNewstJokes(_curPage);
     _hudUtil.hide();
+
+    if (entity == null) {
+      ToastUtil.show('网络错误');
+      return;
+    }
 
     if (entity.isNetFail()) {
       ToastUtil.show('网络错误 - $entity.error_code');
+      return;
+    }
+
+    if (entity.isDataError()) {
+      ToastUtil.show(entity.reason);
       return;
     }
 
