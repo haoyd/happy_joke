@@ -20,13 +20,15 @@ class _DateJokePageState extends State<DateJokePage> {
   int _curPage = 1;
   bool _isFinish = false;
 
-  DateTime _dateTime = DateTime.now();
+  DateTime _dateTime;
   String showDate = '';
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    _dateTime = DateTime.now();
 
     _setCurDate();
 
