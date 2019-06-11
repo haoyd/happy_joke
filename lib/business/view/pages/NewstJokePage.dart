@@ -41,6 +41,7 @@ class _NewstJokePageState extends State<NewstJokePage> {
         leading: null,
         centerTitle: true,
       ),
+
       body: Stack(
         children: <Widget>[
           IncrementallyLoadingListView(

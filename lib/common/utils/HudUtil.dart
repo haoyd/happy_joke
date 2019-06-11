@@ -10,7 +10,7 @@ class HudUtil {
     hud = new ProgressHUD(
       backgroundColor: Colors.black12,
       color: Colors.white,
-      containerColor: Color(0x50000000),
+      containerColor: Color(0x80000000),
       borderRadius: 5.0,
       text: '加载中...',
     );

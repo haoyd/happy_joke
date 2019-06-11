@@ -22,5 +22,17 @@ class JokeServerApi extends BaseServerApi {
     return await doGet2<RandomJokeListEntity>(ServerApiConstant.RandomJoke, null, hud);
   }
 
+  // 按日期搜索
+  Future<JokeListInfoEntity> getDateJokes(int page, String timeStamp, HudUtil hud) async {
+    Map<String, String> param = {
+      'page': page.toString(),
+      'pagesize': 10.toString(),
+      'sort': 'desc',
+      'time': timeStamp,
+    };
+
+    return await doGet<JokeListInfoEntity>(ServerApiConstant.DateJoke, param, hud);
+  }
+
 
 }
