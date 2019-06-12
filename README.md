@@ -4,9 +4,10 @@
 ## 1、用到的技术点
 
 1. ListView 展示 UI 列表。
-2. BottomNavigationBar + IndexedStack 搭建主页面（下面3个Tab，上面3个页面做相应切换），类似Android 底部 Tab 搭配 Fragment使用。
-2. Card 展示 item 信息。
-3. Dio 处理网络请求。
+2. Material Design
+3. BottomNavigationBar + IndexedStack 搭建主页面（下面3个Tab，上面3个页面做相应切换），类似Android 底部 Tab 搭配 Fragment使用。
+4. Card 展示 item 信息。
+5. . Dio 处理网络请求。
 4. 利用 FlutterJsonBeanFactory 生成 entity 类，可快速解析 Json。
 5. 加载中
 6. 下拉刷新、上拉加载
