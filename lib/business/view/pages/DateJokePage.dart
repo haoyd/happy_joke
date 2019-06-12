@@ -1,10 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:happy_joke/business/model/api/JokeServerApi.dart';
 import 'package:happy_joke/business/model/entities/joke_list_info_entity.dart';
 import 'package:happy_joke/common/utils/HudUtil.dart';
 import 'package:happy_joke/common/utils/ToastUtil.dart';
 import 'package:happy_joke/constant/AppConstant.dart';
-import 'package:incrementally_loading_listview/incrementally_loading_listview.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class DateJokePage extends StatefulWidget {
   @override
@@ -17,6 +18,8 @@ class _DateJokePageState extends State<DateJokePage> {
   HudUtil _hudUtil = HudUtil();
   JokeServerApi _api = JokeServerApi();
   JokeListInfoEntity _jokeList = JokeListInfoEntity();
+  RefreshController _refreshController;
+
   int _curPage = 1;
   bool _isFinish = false;
 
@@ -30,9 +33,11 @@ class _DateJokePageState extends State<DateJokePage> {
 
     _dateTime = DateTime.now();
 
+    _refreshController = RefreshController(initialRefresh:false);
+
     _setCurDate();
 
-    _getData();
+    _getData(true, true);
   }
 
   @override
@@ -80,7 +85,7 @@ class _DateJokePageState extends State<DateJokePage> {
                         ).then((DateTime val) {
                           _dateTime = val;
                           _setCurDate();
-                          _getData();
+                          _getData(true, true);
                         }).catchError((err) {
                           print(err);
                         });
@@ -90,13 +95,18 @@ class _DateJokePageState extends State<DateJokePage> {
                 )
               ),
               Expanded (
-                child: IncrementallyLoadingListView(
-                  hasMore: () => !_isFinish,
-                  loadMore: () async {
-                    await _getData();
-                  },
-                  itemBuilder: _buildListItem,
-                  itemCount: () => _jokeList.data != null ? _jokeList.data.length : 0,
+                child: SmartRefresher(
+                  enablePullDown: true,
+                  enablePullUp: true,
+//                  header: defaultTargetPlatform == TargetPlatform.iOS ? WaterDropHeader() : WaterDropMaterialHeader(),
+                  header: ClassicHeader(),
+                  controller: _refreshController,
+                  onRefresh: _onRefresh,
+                  onLoading: _onLoadMore,
+                  child: ListView.builder(
+                      itemBuilder: _buildListItem,
+                      itemCount: _jokeList.data != null ? _jokeList.data.length : 0
+                  ),
                 ),
               ),
 
@@ -110,14 +120,23 @@ class _DateJokePageState extends State<DateJokePage> {
     return widget;
   }
 
-  _getData() async {
+  _getData(bool isRefresh, bool showLoading) async {
     if (_isFinish) {
       ToastUtil.show('已到最后');
       return;
     }
 
-    JokeListInfoEntity entity = await _api.getDateJokes(_curPage, _dateTime.millisecondsSinceEpoch.toString(), _hudUtil);
-//    JokeListInfoEntity entity = await _api.getNewstJokes(_curPage, _hudUtil);
+    JokeListInfoEntity entity = await _api.getDateJokes(_curPage, _dateTime.millisecondsSinceEpoch.toString(), showLoading ? _hudUtil : null);
+
+    if (_refreshController.isLoading) {
+      _refreshController.loadComplete();
+    }
+
+    if (_refreshController.isRefresh) {
+      _refreshController.refreshCompleted();
+    }
+
+    _hudUtil.hide();
 
     if (entity == null) {
       return;
@@ -130,7 +149,11 @@ class _DateJokePageState extends State<DateJokePage> {
     }
 
     setState(() {
-      _jokeList.addDatas(entity.data);
+      if (isRefresh) {
+        _jokeList.setDatas(entity.data);
+      } else {
+        _jokeList.addDatas(entity.data);
+      }
     });
 
     _curPage++;
@@ -170,5 +193,14 @@ class _DateJokePageState extends State<DateJokePage> {
     setState(() {
       showDate = '$year年$month月$day日';
     });
+  }
+
+  _onRefresh() {
+    _curPage = 1;
+    _getData(true, false);
+  }
+
+  _onLoadMore() {
+    _getData(false, false);
   }
 }

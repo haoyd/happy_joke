@@ -1,10 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:happy_joke/business/model/api/JokeServerApi.dart';
 import 'package:happy_joke/business/model/entities/joke_list_info_entity.dart';
 import 'package:happy_joke/common/utils/HudUtil.dart';
 import 'package:happy_joke/common/utils/ToastUtil.dart';
-import 'package:incrementally_loading_listview/incrementally_loading_listview.dart';
 import 'package:progress_hud/progress_hud.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class NewstJokePage extends StatefulWidget {
   @override
@@ -14,17 +15,31 @@ class NewstJokePage extends StatefulWidget {
 }
 
 class _NewstJokePageState extends State<NewstJokePage> {
+
   HudUtil _hudUtil = HudUtil();
   JokeServerApi _api = JokeServerApi();
   JokeListInfoEntity _jokeList = JokeListInfoEntity();
   int _curPage = 1;
   bool _isFinish = false;
 
+  RefreshController _refreshController;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _getData();
+
+    // initialRefresh可以在组件初始化时执行一次刷新操作
+    _refreshController = RefreshController(initialRefresh:false);
+
+    _getData(true, true);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _refreshController.dispose();
   }
 
   @override
@@ -44,13 +59,17 @@ class _NewstJokePageState extends State<NewstJokePage> {
 
       body: Stack(
         children: <Widget>[
-          IncrementallyLoadingListView(
-              hasMore: () => !_isFinish,
-              loadMore: () async {
-                await _getData();
-              },
-              itemBuilder: _buildListItem,
-              itemCount: () => _jokeList.data != null ? _jokeList.data.length : 0
+          SmartRefresher(
+            enablePullDown: true,
+            enablePullUp: true,
+            header: ClassicHeader(),
+            controller: _refreshController,
+            onRefresh: _onRefresh,
+            onLoading: _onLoadMore,
+            child: ListView.builder(
+                itemBuilder: _buildListItem,
+                itemCount: _jokeList.data != null ? _jokeList.data.length : 0
+            ),
           ),
           _hudUtil.hud
         ],
@@ -60,13 +79,23 @@ class _NewstJokePageState extends State<NewstJokePage> {
     return widget;
   }
 
-  _getData() async {
+  _getData(bool isRefresh, bool showLoading) async {
     if (_isFinish) {
       ToastUtil.show('已到最后');
       return;
     }
 
-    JokeListInfoEntity entity = await _api.getNewstJokes(_curPage, _hudUtil);
+    JokeListInfoEntity entity = await _api.getNewstJokes(_curPage, showLoading ? _hudUtil : null);
+
+    if (_refreshController.isLoading) {
+      _refreshController.loadComplete();
+    }
+
+    if (_refreshController.isRefresh) {
+      _refreshController.refreshCompleted();
+    }
+
+    _hudUtil.hide();
 
     if (entity == null) {
       return;
@@ -79,7 +108,11 @@ class _NewstJokePageState extends State<NewstJokePage> {
     }
 
     setState(() {
-      _jokeList.addDatas(entity.data);
+      if (isRefresh) {
+        _jokeList.setDatas(entity.data);
+      } else {
+        _jokeList.addDatas(entity.data);
+      }
     });
 
     _curPage++;
@@ -109,5 +142,14 @@ class _NewstJokePageState extends State<NewstJokePage> {
         ),
       ),
     );
+  }
+
+  _onRefresh() {
+    _curPage = 1;
+    _getData(true, false);
+  }
+
+  _onLoadMore() {
+    _getData(false, false);
   }
 }
