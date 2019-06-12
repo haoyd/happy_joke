@@ -1,10 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:happy_joke/business/model/api/JokeServerApi.dart';
 import 'package:happy_joke/business/model/entities/joke_list_info_entity.dart';
 import 'package:happy_joke/common/utils/HudUtil.dart';
 import 'package:happy_joke/common/utils/ToastUtil.dart';
-import 'package:progress_hud/progress_hud.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class NewstJokePage extends StatefulWidget {
