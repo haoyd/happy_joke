@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:happy_joke/business/model/api/JokeServerApi.dart';
-import 'package:happy_joke/business/model/entities/joke_list_info_entity.dart';
 import 'package:happy_joke/business/model/entities/random_joke_list_entity.dart';
 import 'package:happy_joke/common/utils/HudUtil.dart';
-import 'package:happy_joke/common/utils/ToastUtil.dart';
-import 'package:incrementally_loading_listview/incrementally_loading_listview.dart';
 
 class RandomJokePage extends StatefulWidget {
   @override
