@@ -28,7 +28,7 @@ class JokeServerApi extends BaseServerApi {
       'page': page.toString(),
       'pagesize': 10.toString(),
       'sort': 'desc',
-      'time': timeStamp,
+      'time': timeStamp.length > 10 ? timeStamp.substring(0, 10) : timeStamp,
     };
 
     return await doGet<JokeListInfoEntity>(ServerApiConstant.DateJoke, param, hud);

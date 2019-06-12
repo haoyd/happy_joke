@@ -38,11 +38,8 @@ class BaseServerApi {
         hud.show();
       }
 
-      Response response = await _net.get(url, queryParameters: buildCommonParams(param));
-
-      if (hud != null) {
-        hud.hide();
-      }
+      param = buildCommonParams(param);
+      Response response = await _net.get(url, queryParameters: param);
 
       if (response.statusCode == 200) {
         if (response.data['result'] != null) {
@@ -60,6 +57,10 @@ class BaseServerApi {
 
     } catch (e) {
       print(e);
+    } finally {
+      if (hud != null) {
+        hud.hide();
+      }
     }
 
     return resp;
