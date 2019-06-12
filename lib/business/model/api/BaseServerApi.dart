@@ -4,6 +4,7 @@ import 'package:happy_joke/common/listeners/NetCallback.dart';
 import 'package:happy_joke/common/utils/HudUtil.dart';
 import 'package:happy_joke/common/utils/LogUtil.dart';
 import 'package:happy_joke/common/utils/ToastUtil.dart';
+import 'package:happy_joke/constant/AppConstant.dart';
 import 'package:happy_joke/constant/KeyOf3rdConstant.dart';
 import 'package:happy_joke/constant/ServerApiConstant.dart';
 import 'dart:convert';
@@ -20,6 +21,14 @@ class BaseServerApi {
       receiveTimeout: 5000,
     );
     _net = Dio(options);
+
+    // 设置代理用来调试应用
+    (_net.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
+      client.findProxy = (Uri) {
+        return AppConstant.isDebug ? 'PROXY 192.168.31.128:8888' : 'DIRECT';
+      };
+    };
+
   }
 
   Map<String, String> buildCommonParams(Map<String, String> param) {
