@@ -31,6 +31,18 @@ class BaseServerApi {
 
   }
 
+  Dio dio;
+  void setHttp() {
+    dio = Dio();
+
+    // 设置代理用来调试应用
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate = (client) {
+      client.findProxy = (Uri) {
+        return AppConstant.isDebug ? 'PROXY 192.168.31.128:8888' : 'DIRECT';
+      };
+    };
+  }
+
   Map<String, String> buildCommonParams(Map<String, String> param) {
     if (param == null) {
       param = {};
