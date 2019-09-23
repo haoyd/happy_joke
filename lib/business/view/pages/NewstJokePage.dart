@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:isolate';
+
 import 'package:flutter/material.dart';
 import 'package:happy_joke/business/model/api/JokeServerApi.dart';
 import 'package:happy_joke/business/model/entities/joke_list_info_entity.dart';
@@ -150,4 +153,59 @@ class _NewstJokePageState extends State<NewstJokePage> {
   _onLoadMore() {
     _getData(false, false);
   }
+
+}
+
+class AA {
+  void main() {
+
+  }
+
+  create_isolate() async{
+    ReceivePort rp = new ReceivePort();
+    SendPort port1 = rp.sendPort;
+
+    Isolate newIsolate = await Isolate.spawn(doWork, port1);
+
+    SendPort port2;
+    rp.listen((message){
+      print("main isolate message: $message");
+      if (message[0] == 0){
+        port2 = message[1];
+      }else{
+        port2?.send([1,"这条信息是 main isolate 发送的"]);
+      }
+    });
+  }
+
+  // 处理耗时任务
+  void doWork(SendPort port1){
+    print("new isolate start");
+    ReceivePort rp2 = new ReceivePort();
+    SendPort port2 = rp2.sendPort;
+
+    rp2.listen((message){
+      print("doWork message: $message");
+    });
+
+    // 将新isolate中创建的SendPort发送到主isolate中用于通信
+    port1.send([0, port2]);
+    // 模拟耗时5秒
+    sleep(Duration(seconds:5));
+    port1.send([1, "doWork 任务完成"]);
+
+    print("new isolate end");
+  }
+}
+
+int a = 5;
+
+class EE extends Isolate {
+
+  EE(SendPort controlPort) : super(controlPort);
+
+  void aa() {
+    a = 6;
+  }
+
 }
